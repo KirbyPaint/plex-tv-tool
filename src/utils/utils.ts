@@ -6,7 +6,6 @@ export async function mapSeriesToDatabaseEntry(
   entries: Series[]
 ): Promise<number> {
   let recordsInserted = 0;
-  // for each entry, create or update one record in the database
   entries.forEach(async (entry) => {
     try {
       const create = {
@@ -27,6 +26,7 @@ export async function mapSeriesToDatabaseEntry(
         update: create,
       });
       recordsInserted++;
+      console.log({ recordsInserted });
     } catch (e) {
       console.log(e);
     }
