@@ -25,22 +25,20 @@ async function downloadAPIThings(doTheThing: boolean): Promise<void> {
   }
 }
 
-// ok so basically this function will ask for an input from the user
-// and that input somehow will determine what show is pulled
-// probably do the show ID, and then get all episodes based on id
-
 function promptUser(): void {
   prompt.start();
-  prompt.get([`doTheThing`], (err, result) => {
+  prompt.get([`fetchShows`, `showName`], (err, result) => {
     if (err) {
       throw new Error(err as unknown as string);
     }
-    fetchSeriesEpisodesById(result.doTheThing.toString(), `default`);
+    if ([`yes`, `1`].includes(result.fetchShows.toString().toLowerCase())) {
+      downloadAPIThings(true);
+    }
+    fetchSeriesEpisodesById(result.showName.toString(), `default`);
   });
 }
 async function main(): Promise<void> {
   promptUser();
-  downloadAPIThings(false);
 }
 
 main();

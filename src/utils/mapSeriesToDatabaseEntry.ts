@@ -10,10 +10,10 @@ export async function mapSeriesToDatabaseEntry(
     try {
       const create = {
         ...entry,
-        nameTranslations: entry?.nameTranslations?.toString(),
-        overviewTranslations: entry?.overviewTranslations?.toString(),
-        aliases: entry?.aliases?.toString() ?? ``,
-        status: entry?.status?.toString(),
+        nameTranslations: JSON.stringify(entry?.nameTranslations),
+        overviewTranslations: JSON.stringify(entry?.overviewTranslations),
+        aliases: JSON.stringify(entry?.aliases) ?? ``,
+        status: JSON.stringify(entry?.status),
         image: entry.image ?? ``,
         firstAired: entry?.firstAired ?? undefined,
         lastAired: entry?.lastAired ?? undefined,

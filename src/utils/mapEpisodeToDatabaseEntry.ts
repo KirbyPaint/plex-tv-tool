@@ -10,8 +10,8 @@ export async function mapEpisodeToDatabaseEntry(
     try {
       const create = {
         ...entry,
-        nameTranslations: entry?.nameTranslations?.toString(),
-        overviewTranslations: entry?.overviewTranslations?.toString(),
+        nameTranslations: JSON.stringify(entry?.nameTranslations),
+        overviewTranslations: JSON.stringify(entry?.overviewTranslations),
       };
       await prisma.episode.upsert({
         where: { id: entry.id },
