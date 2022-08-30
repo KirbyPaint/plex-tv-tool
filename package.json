@@ -1,0 +1,20 @@
+{
+  "name": "plex-tv-tool",
+  "version": "1.0.0",
+  "description": "Tool designed to connect to the TVDB to manage Plex media",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KirbyPaint/plex-tv-tool.git"
+  },
+  "keywords": [],
+  "author": "KirbyPaint",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KirbyPaint/plex-tv-tool/issues"
+  },
+  "homepage": "https://github.com/KirbyPaint/plex-tv-tool#readme"
+}
