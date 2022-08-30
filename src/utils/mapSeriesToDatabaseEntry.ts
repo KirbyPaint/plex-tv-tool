@@ -26,9 +26,8 @@ export async function mapSeriesToDatabaseEntry(
         update: create,
       });
       recordsInserted++;
-      console.log({ recordsInserted });
     } catch (e) {
-      console.log(e);
+      throw new Error(e as unknown as string);
     }
   });
   return recordsInserted;

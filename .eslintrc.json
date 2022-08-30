@@ -17,6 +17,7 @@
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "backtick"],
     "semi": ["error", "always"],
-    "@typescript-eslint/explicit-function-return-type": "error"
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "no-console": "warn"
   }
 }

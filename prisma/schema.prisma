@@ -25,11 +25,33 @@ model Series {
   status               String?
   originalCountry      String?
   originalLanguage     String?
-  defaultSeasonType    Int?
+  defaultSeasonType    Int? // might be actually enum?
   isOrderRandomized    Boolean?
   lastUpdated          String?
   averageRuntime       Int?
   episodes             String?
   overview             String?
   year                 String?
+}
+
+model Episode {
+  id                   Int     @id @unique
+  seriesId             Int
+  name                 String
+  aired                String?
+  runtime              Int?
+  nameTranslations     String?
+  overview             String?
+  overviewTranslations String?
+  image                String?
+  imageType            Int?
+  isMovie              Int?
+  seasons              String?
+  number               Int?
+  seasonNumber         Int?
+  lastUpdated          String?
+  finaleType           String?
+  year                 String?
+  airsBeforeSeason     Int?
+  airsBeforeEpisode    Int?
 }
