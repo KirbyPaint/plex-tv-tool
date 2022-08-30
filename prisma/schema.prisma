@@ -9,3 +9,27 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Series {
+  id                   Int       @id @unique
+  name                 String
+  slug                 String    @unique
+  image                String
+  nameTranslations     String // json stringify
+  overviewTranslations String // json stringify
+  aliases              String // json stringify
+  firstAired           DateTime // convert to TZ date?
+  lastAired            DateTime
+  nextAired            DateTime?
+  score                Int
+  status               String // json stringify
+  originalCountry      String
+  originalLanguage     String
+  defaultSeasonType    Int
+  isOrderRandomized    Boolean
+  lastUpdated          DateTime
+  averageRuntime       Int
+  episodes             String // json stringify? Or Relation?
+  overview             String
+  year                 String
+}
