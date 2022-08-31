@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
-import { readdir, writeFileSync } from "fs";
+import { readdir, readdirSync, writeFileSync } from "fs";
 import path from "path";
 import { mapEpisodeToDatabaseEntry } from "./mapEpisodeToDatabaseEntry";
 
@@ -29,17 +29,34 @@ export async function fetchSeriesEpisodesById(
     // This will presumably run in the folder where the show's seasons lie
     // Recursively scan the folder for seasons containing episodes
     const tryPath = path.resolve(__dirname, `../../../`, existingShows[0].name);
-    readdir(tryPath, function (err: any | null, files: string[]) {
-      //handling error
-      // if (err) {
-      //   return console.log(`Unable to scan directory: ` + err);
-      // }
-      //listing all files using forEach
-      files.forEach(function (file) {
-        // Do whatever you want to do with the file
-        console.log(file);
-      });
-    });
+    const dirents = readdirSync(tryPath, { withFileTypes: true });
+    const filesNames = dirents
+      .filter((dirent) => dirent.isFile())
+      .map((dirent) => dirent.name);
+    console.log(
+      `found ${filesNames.length} files in local ${existingShows[0].name} directory`
+    );
+    if (filesNames.length !== episodes.length) {
+      console.log(
+        `Episode count mismatch between TVDB and local files, consider manually reviewing episode list before mass-renaming to prevent inconsistency`
+      );
+      return;
+    }
+    // readdir(
+    //   tryPath,
+    //   { withFileTypes: true },
+    //   function (err: NodeJS.ErrnoException | null, files: string[]) {
+    //     //handling error
+    //     if (err) {
+    //       return console.log(`Unable to scan directory: ` + err);
+    //     }
+    //     //listing all files using forEach
+    //     files.forEach(function (file) {
+    //       // Do whatever you want to do with the file
+    //       console.log(file);
+    //     });
+    //   }
+    // );
     return;
   }
   // if (existingShow) {
