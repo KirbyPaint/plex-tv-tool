@@ -12,7 +12,7 @@ datasource db {
 
 model Series {
   id                   Int      @id @unique
-  name                 String
+  name                 String?
   slug                 String   @unique
   image                String?
   nameTranslations     String?

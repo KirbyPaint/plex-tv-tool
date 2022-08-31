@@ -19,6 +19,7 @@ export async function mapSeriesToDatabaseEntry(
         lastAired: entry?.lastAired ?? undefined,
         averageRuntime: entry.averageRuntime ?? undefined,
         originalCountry: entry.originalCountry ?? undefined,
+        name: entry.name ?? undefined,
       };
       await prisma.series.upsert({
         where: { id: entry.id },
