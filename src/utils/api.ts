@@ -3,8 +3,10 @@ import axios from "axios";
 import { readdir, readdirSync, writeFileSync } from "fs";
 import path from "path";
 import { mapEpisodeToDatabaseEntry } from "./mapEpisodeToDatabaseEntry";
+import chalk from "chalk";
 
 const prisma = new PrismaClient();
+const log = console.log;
 
 export async function fetchSeriesEpisodesById(
   showName: string,
@@ -15,17 +17,17 @@ export async function fetchSeriesEpisodesById(
   const existingShows = await prisma.series.findMany({
     where: { name: { contains: showName } },
   });
-  console.log(`this search found ${existingShows.length} results`);
+  log(chalk.blue(`this search found ${existingShows.length} results`));
   if (existingShows) {
-    console.log(`hey look we probably already downloaded it`);
-    console.log(`defaulting to the first result: ${existingShows[0].name}`);
+    log(chalk.green(`hey look we probably already downloaded it`));
+    log(`defaulting to the first result: ${existingShows[0].name}`);
     const episodes = await prisma.episode.findMany({
       where: { seriesId: existingShows[0].id },
     });
-    console.log(
+    log(
       `we have ${episodes.length} episodes of show ${existingShows[0].name} in the TVDB records`
     );
-    console.log(`scanning local files for episode count`);
+    log(`scanning local files for episode count`);
     // This will presumably run in the folder where the show's seasons lie
     // Recursively scan the folder for seasons containing episodes
     const tryPath = path.resolve(__dirname, `../../../`, existingShows[0].name);
@@ -33,11 +35,11 @@ export async function fetchSeriesEpisodesById(
     const filesNames = dirents
       .filter((dirent) => dirent.isFile())
       .map((dirent) => dirent.name);
-    console.log(
+    log(
       `found ${filesNames.length} files in local ${existingShows[0].name} directory`
     );
     if (filesNames.length !== episodes.length) {
-      console.log(
+      log(
         `Episode count mismatch between TVDB and local files, consider manually reviewing episode list before mass-renaming to prevent inconsistency`
       );
       return;
@@ -48,12 +50,12 @@ export async function fetchSeriesEpisodesById(
     //   function (err: NodeJS.ErrnoException | null, files: string[]) {
     //     //handling error
     //     if (err) {
-    //       return console.log(`Unable to scan directory: ` + err);
+    //       return log(`Unable to scan directory: ` + err);
     //     }
     //     //listing all files using forEach
     //     files.forEach(function (file) {
     //       // Do whatever you want to do with the file
-    //       console.log(file);
+    //       log(file);
     //     });
     //   }
     // );
@@ -61,7 +63,7 @@ export async function fetchSeriesEpisodesById(
   }
   // if (existingShow) {
   //   // if the show is in the db, then we can just get the episodes from the db
-  //   console.log(episodes);
+  //   log(episodes);
   // } else {
   // search the db for shows matching the showName
   const matching = await prisma.series.findMany({
@@ -81,7 +83,7 @@ export async function fetchSeriesEpisodesById(
         },
       })
       .then(async (res) => {
-        console.log(res.data.data.episodes);
+        log(res.data.data.episodes);
         writeFileSync(
           `./episodes.json`,
           JSON.stringify(res.data.data.episodes)
