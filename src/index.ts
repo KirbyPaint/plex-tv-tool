@@ -47,7 +47,7 @@ function ezDownload(pages: string[]): void {
   });
 }
 async function main(): Promise<void> {
-  const offset = 100;
+  const offset = 200;
   const pages = [...Array(100).keys()].map((x) => (offset + x++).toString());
   ezDownload(pages);
 }
