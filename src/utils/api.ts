@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
-import { writeFileSync } from "fs";
+import { readdir, writeFileSync } from "fs";
+import path from "path";
 import { mapEpisodeToDatabaseEntry } from "./mapEpisodeToDatabaseEntry";
 
 const prisma = new PrismaClient();
@@ -11,18 +12,38 @@ export async function fetchSeriesEpisodesById(
 ): Promise<void> {
   // first, search the existing db for the show
   // to try and avoid making extra calls to the API
-  const existingShow = await prisma.series.findFirstOrThrow({
-    where: { name: showName },
+  const existingShows = await prisma.series.findMany({
+    where: { name: { contains: showName } },
   });
-  if (existingShow) {
-    console.log(`hey look we already downloaded it`);
+  console.log(`this search found ${existingShows.length} results`);
+  if (existingShows) {
+    console.log(`hey look we probably already downloaded it`);
+    console.log(`defaulting to the first result: ${existingShows[0].name}`);
+    const episodes = await prisma.episode.findMany({
+      where: { seriesId: existingShows[0].id },
+    });
+    console.log(
+      `we have ${episodes.length} episodes of show ${existingShows[0].name} in the TVDB records`
+    );
+    console.log(`scanning local files for episode count`);
+    // This will presumably run in the folder where the show's seasons lie
+    // Recursively scan the folder for seasons containing episodes
+    const tryPath = path.resolve(__dirname, `../../../`, existingShows[0].name);
+    readdir(tryPath, function (err: any | null, files: string[]) {
+      //handling error
+      // if (err) {
+      //   return console.log(`Unable to scan directory: ` + err);
+      // }
+      //listing all files using forEach
+      files.forEach(function (file) {
+        // Do whatever you want to do with the file
+        console.log(file);
+      });
+    });
     return;
   }
   // if (existingShow) {
   //   // if the show is in the db, then we can just get the episodes from the db
-  //   const episodes = await prisma.episodes.findMany({
-  //     where: { seriesId: existingShow.id },
-  //   });
   //   console.log(episodes);
   // } else {
   // search the db for shows matching the showName
