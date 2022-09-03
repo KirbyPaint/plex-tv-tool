@@ -72,6 +72,8 @@ async function main(): Promise<void> {
         )
       );
     }
+    // 'files' contains both files and directories
+    // Filter out all of the directories (they all contain Season)
     const localFileCount = files.length;
     console.log(
       chalk.blue(`Found ${localFileCount} files in ${showNameFull} directory`)
