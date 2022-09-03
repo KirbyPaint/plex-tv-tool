@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf ./build && tsc",
     "dev": "nodemon",
-    "start": "yarn run build && node build/index.js"
+    "start": "yarn run build && node build/src/index.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/KirbyPaint/plex-tv-tool#readme",
   "devDependencies": {
-    "@types/prompt": "^1.1.2",
+    "@types/prompt-sync": "^4.1.1",
     "@typescript-eslint/eslint-plugin": "^5.36.0",
     "@typescript-eslint/parser": "^5.36.0",
     "eslint": "^8.23.0",
@@ -37,6 +37,9 @@
     "axios": "^0.27.2",
     "chalk": "4.1.0",
     "dotenv": "^16.0.1",
-    "prompt": "^1.3.0"
+    "prompt-sync": "^4.2.0"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

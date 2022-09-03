@@ -4,10 +4,16 @@ import { readdirSync, writeFileSync } from "fs";
 import path from "path";
 import { mapEpisodeToDatabaseEntry } from "./mapEpisodeToDatabaseEntry";
 import chalk from "chalk";
-import { mapSeriesToDatabaseEntry } from "./mapSeriesToDatabaseEntry";
+import { mapSeriesToDatabaseEntry } from "./database-functions";
 
 const prisma = new PrismaClient();
 const log = console.log;
+
+// This file should only contain pure functions
+// that retrieve results (or not) from the API
+
+// NO database entries should be made here
+// NO utility functions should be made here
 
 // Need to break this up into other functions
 export async function fetchSeriesEpisodesById(
@@ -103,76 +109,93 @@ export async function fetchEpisodesBySeriesId(
 }
 
 // This should just download into the database
-export async function fetchSeriesById(
-  id: number,
-  seasonType?: string
-): Promise<Episode[] | Error | undefined> {
-  let episodes;
+// export async function fetchSeriesById(
+//   id: number,
+//   seasonType?: string
+// ): Promise<Episode[] | Error | undefined> {
+//   let episodes;
+//   const baseUrl = process.env.BASE_URL;
+//   const url = new URL(
+//     baseUrl + `series/` + id + `/episodes/` + (seasonType ?? `default`)
+//   ).pathname;
+//   const existingShow = await prisma.series.findFirst({
+//     where: { id },
+//   });
+//   if (existingShow?.name) {
+//     log(
+//       chalk.blue(
+//         `show ${existingShow.name} already exists in the local database`
+//       )
+//     );
+//     log(chalk.blue(`Checking for episodes`));
+//     return; // stopgap to fix bugs
+//   }
+//   const existingEpisodes = await prisma.episode.findMany({
+//     where: { seriesId: id },
+//   });
+//   if (existingEpisodes.length > 0) {
+//     log(
+//       chalk.blue(
+//         `we have ${existingEpisodes.length} episodes of show ${existingShow?.name} in the local database`
+//       )
+//     );
+//     return existingEpisodes;
+//   }
+//   log(chalk.blue(`fetching show with id ${id} from the API`));
+//   const apiEpisodes = await fetchEpisodesBySeriesId(id, seasonType);
+//   if (apiEpisodes instanceof Error) {
+//     throw new Error(apiEpisodes.message);
+//   }
+//   if (apiEpisodes?.length === 0) {
+//     log(chalk.red(`no episodes found for show with id ${id}`));
+//     return;
+//   }
+//   log(
+//     chalk.blue(`found ${apiEpisodes.length} episodes for show with id ${id}`)
+//   );
+//   log(chalk.blue(`mapping episodes to database entries`));
+//   await mapEpisodeToDatabaseEntry(apiEpisodes);
+// }
+
+export async function fetchSeriesById(id: number, seasonType: string) {
   const baseUrl = process.env.BASE_URL;
   const url = new URL(
     baseUrl + `series/` + id + `/episodes/` + (seasonType ?? `default`)
-  ).pathname;
-  const existingShow = await prisma.series.findFirst({
-    where: { id },
-  });
-  if (existingShow?.name) {
-    log(
-      chalk.blue(
-        `show ${existingShow.name} already exists in the local database`
-      )
-    );
-    log(chalk.blue(`Checking for episodes`));
+  ).toString();
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ` + process.env.BEARER,
+      },
+    });
+    // console.log(response.data.data.episodes);
+    return response.data.data.episodes;
+  } catch (e) {
+    throw new Error(e as unknown as string);
   }
-  const existingEpisodes = await prisma.episode.findMany({
-    where: { seriesId: id },
-  });
-  if (existingEpisodes.length > 0) {
-    log(
-      chalk.blue(
-        `we have ${existingEpisodes.length} episodes of show ${existingShow?.name} in the local database`
-      )
-    );
-    return existingEpisodes;
-  }
-  log(chalk.blue(`fetching show with id ${id} from the API`));
-  const apiEpisodes = await fetchEpisodesBySeriesId(id, seasonType);
-  if (apiEpisodes instanceof Error) {
-    throw new Error(apiEpisodes.message);
-  }
-  if (apiEpisodes?.length === 0) {
-    log(chalk.red(`no episodes found for show with id ${id}`));
-    return;
-  }
-  log(
-    chalk.blue(`found ${apiEpisodes.length} episodes for show with id ${id}`)
-  );
-  log(chalk.blue(`mapping episodes to database entries`));
-  await mapEpisodeToDatabaseEntry(apiEpisodes);
 }
 
-export async function showToId(showName: string): Promise<number> {
+export async function showToId(showName: string): Promise<[number, string]> {
   const show = await prisma.series.findFirstOrThrow({
     where: { name: { contains: showName } },
   });
-  return show.id;
+  return [show.id, show.name ?? ""];
 }
 
-export async function fetchAllShows(
+// this should return series array
+export async function fetchSeriesByPageNumber(
   doTheThing: boolean,
   pageNumber: string
-): Promise<void> {
+): Promise<any> {
   if (doTheThing) {
     const url = process.env.BASE_URL;
     try {
-      await axios
-        .get(url + `series?page=${pageNumber}`, {
-          headers: {
-            Authorization: `Bearer ` + process.env.BEARER,
-          },
-        })
-        .then(async (res) => {
-          await mapSeriesToDatabaseEntry(res.data.data);
-        });
+      const seriesPage = await axios.get(url + `series?page=${pageNumber}`, {
+        headers: {
+          Authorization: `Bearer ` + process.env.BEARER,
+        },
+      });
+      return seriesPage;
     } catch (e) {
       throw new Error(e as unknown as string);
     }

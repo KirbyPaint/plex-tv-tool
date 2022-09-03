@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 export async function mapEpisodeToDatabaseEntry(
   entries: Episode[]
 ): Promise<number> {
-  let recordsInserted = 0;
   entries.forEach(async (entry) => {
     try {
       const create = {
@@ -18,10 +17,10 @@ export async function mapEpisodeToDatabaseEntry(
         create,
         update: create,
       });
-      recordsInserted++;
     } catch (e) {
       throw new Error(e as unknown as string);
     }
   });
-  return recordsInserted;
+  return entries.length; // I want this to be the number from the await, ideally
+  // confirming exactly how many entries got created
 }

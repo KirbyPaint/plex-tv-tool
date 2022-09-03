@@ -53,5 +53,12 @@ model Episode {
   finaleType           String?
   year                 String?
   airsBeforeSeason     Int?
+  airsAfterSeason      Int?
   airsBeforeEpisode    Int?
+  airsAfterEpisode     Int?
+}
+
+model LastSyncedAt {
+  id        Int      @id @unique @default(autoincrement())
+  timestamp DateTime @default(now())
 }
