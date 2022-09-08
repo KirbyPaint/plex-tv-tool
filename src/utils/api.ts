@@ -175,11 +175,13 @@ export async function fetchSeriesById(id: number, seasonType: string) {
   }
 }
 
-export async function showToId(showName: string): Promise<[number, string]> {
+export async function showToId(
+  showName: string
+): Promise<[number, string, string]> {
   const show = await prisma.series.findFirstOrThrow({
     where: { name: { contains: showName } },
   });
-  return [show.id, show.name ?? ""];
+  return [show.id, show.name ?? "", show.year ?? ""];
 }
 
 // this should return series array
